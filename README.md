@@ -8,6 +8,13 @@ The source for the Ember.js Guides.
 ## Tutorial dev Fork
 This fork is a WIP for the tutorial rewrite. (http://kidgodzilla.github.io/guides/tutorial/ember-cli/)
 
+## Demo of Ember Rentals Application
+http://ember-tutorial.surge.sh/
+
+## ember-tutorial Ember Addon
+This contains the assets and styling for the new tutorial.
+https://github.com/kidGodzilla/ember-tutorial
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md).
