@@ -15,13 +15,13 @@ As before, this creates a Handlebars template
 The Handlebars template looks like this:
 
 ```app/templates/components/filter-listing.hbs
-City: {{input value=filter key-up=(action 'autoComplete')}} 
-<button {{action 'search'}}>Search</button>
+{{input action="search" value=filter key-up=(action 'autoComplete') class="light" placeholder="Search Cities"}}
+<button {{action 'search'}} class="button light">Search</button>
 
-<ul>
-{{#each filteredList as |item|}}
-  <li {{action 'choose' item.city}}>{{item.city}}</li>
-{{/each}}
+<ul class="results">
+  {{#each filteredList as |item|}}
+      <li {{action 'choose' item.city}}>{{item.city}}</li>
+  {{/each}}
 </ul>
 ```
 It contains an [`{{input}}`](../../templates/input-helpers) helper
@@ -42,23 +42,27 @@ the name of that `city`.
 Here is what the component's JavaScript looks like:
 
 ```app/components/filter-listing.js
+import Ember from 'ember';
+
 export default Ember.Component.extend({
   filter: null,
   filteredList: null,
   actions: {
     autoComplete() {
       this.get('autoComplete')(this.get('filter'));
+      Ember.$('.menu .results').show();
     },
     search() {
       this.get('search')(this.get('filter'));
     },
     choose(city) {
       this.set('filter', city);
+      Ember.$('.menu .results').hide();
     }
   }
 });
-
 ```
+
 There's a property for each of the `filter` and `filteredList`, and 
 actions as described above. What's interesting is that only the `choose` 
 action is defined by the component. The actual logic of each of the 
@@ -67,42 +71,56 @@ properties, which  means that those actions need to be [passed]
  (../../components/triggering-changes-with-actions/#toc_passing-the-action-to-the-component) 
  in by the calling object, a pattern known as _closure actions_.
 
-To see how this works, change your `index.hbs` template to look like this:
+To see how this works, change your `application.hbs` template to look like this:
 
-```app/templates/index.hbs
-<h1>Welcome to Super Rentals</h1>
-
-We hope you find exactly what you're looking for in a place to stay.
-<br /><br />
-{{filter-listing filteredList=filteredList 
-autoComplete=(action 'autoComplete') search=(action 'search')}}
-{{#each model as |rentalUnit|}}
-  {{rental-listing rental=rentalUnit}}
-{{/each}}
-
-{{#link-to 'about'}}About{{/link-to}}
-{{#link-to 'contact'}}Click here to contact us.{{/link-to}}
+```app/templates/application.hbs
+<div class="container" {{action 'hideAutocomplete'}}>
+    <div class="menu">
+        {{#link-to 'index'}}
+            <h1 class="left">
+                <img src="http://emberjs.com/images/ember-logo.svg" alt="Ember Logo">
+                <em>rentals</em>
+            </h1>
+        {{/link-to}}
+        <div class="left links">
+            {{#link-to 'about'}}
+                About
+            {{/link-to}}
+            {{#link-to 'contact'}}
+                Contact
+            {{/link-to}}
+        </div>
+        <div class="right relative">
+          {{filter-listing filteredList=filteredList
+          autoComplete=(action 'autoComplete') search=(action 'search')}}
+        </div>
+    </div>
+    <div class="body">
+        {{outlet}}
+    </div>
+</div>
 ```
-We've added the `filter-listing` component to our `index.hbs` template. We 
+We've added the `filter-listing` component to our `application.hbs` template. We 
 then pass in the functions and properties we want the `filter-listing` 
-component to use, so that the `index` page can define some of how it wants 
+component to use, so that the application can define some of how it wants 
 the component to behave, and so the component can use those specific 
 functions and properties.
 
 For this to work, we need to introduce a `controller` into our app. 
-Generate a controller for the `index` page by running the following:
+Generate a controller for the application by running the following:
 
 ```shell
-ember g controller index
+ember g controller application
 ```
 
 Now, define your new controller like so:
 
-```app/controllers/index.js
+```app/controllers/application.js
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
   filteredList: null,
+  indexController: Ember.inject.controller('index'),
   actions: {
     autoComplete(param) {
       if (param !== '') {
@@ -113,13 +131,17 @@ export default Ember.Controller.extend({
     },
     search(param) {
       if (param !== '') {
-        this.store.query('rental', { city: param }).then((result) => this.set('model', result));
+        this.store.query('rental', { city: param }).then((result) => this.set('indexController.model', result));
       } else {
-        this.get('store').findAll('rental').then((result) => this.set('model', result));
+        this.get('store').findAll('rental').then((result) => this.set('indexController.model', result));
       }
+    },
+    hideAutocomplete() {
+      Ember.$('.menu .results').hide();
     }
   }
 });
+
 ```
 
 As you can see, we define a property in the controller called 

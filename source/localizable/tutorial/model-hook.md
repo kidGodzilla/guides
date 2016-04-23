@@ -6,7 +6,7 @@ Later, we'll switch to using Ember Data, a library for robustly managing data in
 
 Here's what our homepage will look like when we're done:
 
-![super rentals homepage with rentals list](../../images/models/super-rentals-index-with-list.png)
+![Ember rentals homepage with rentals list](../../images/models/index.png)
 
 In Ember, route handlers are responsible for loading model data.
 Let's open `app/routes/index.js` and add our hard-coded data as the return value of the `model` hook:
@@ -60,20 +60,35 @@ Here, we'll use another common Handlebars helper called `{{each}}`.
 This helper will let us loop through each of the objects in our model:
 
 ```app/templates/index.hbs
-<h1>Welcome to Super Rentals</h1>
-
-<p>We hope you find exactly what you're looking for in a place to stay.</p>
+<div class="jumbo">
+    <img class="right" src="http://emberjs.com/images/blog/2016-02/lts-tomster.png" alt="Tomster">
+    <h2>Welcome!</h2>
+    <p>
+        We hope you find exactly what you're looking for in a place to stay.
+        <br>Browse our listings, or use the search box above to narrow your search.
+    </p>
+    {{#link-to 'about' class="button"}}
+        About Us
+    {{/link-to}}
+</div>
 
 {{#each model as |rental|}}
-  <h2>{{rental.title}}</h2>
-  <p>Owner: {{rental.owner}}</p>
-  <p>Type: {{rental.type}}</p>
-  <p>Location: {{rental.city}}</p>
-  <p>Number of bedrooms: {{rental.bedrooms}}</p>
+    <article class="listing">
+        <h3>{{rental.title}}</h3>
+        <div class="detail">
+            <span>Owner:</span> {{rental.owner}}
+        </div>
+        <div class="detail">
+            <span>Type:</span> {{rental.type}}
+        </div>
+        <div class="detail">
+            <span>Location:</span> {{rental.city}}
+        </div>
+        <div class="detail">
+            <span>Number of bedrooms:</span> {{rental.bedrooms}}
+        </div>
+    </article>
 {{/each}}
-
-{{#link-to "about"}}About{{/link-to}}
-{{#link-to "contact"}}Click here to contact us.{{/link-to}}
 ```
 
 In this template, we loop through each model object and call it _rental_.

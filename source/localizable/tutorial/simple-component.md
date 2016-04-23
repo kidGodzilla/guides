@@ -30,20 +30,42 @@ To start, let's move the rental display details for a single rental from the `in
 into `rental-listing.hbs`:
 
 ```app/templates/components/rental-listing.hbs
-<h2>{{rental.title}}</h2>
-<p>Owner: {{rental.owner}}</p>
-<p>Type: {{rental.type}}</p>
-<p>Location: {{rental.city}}</p>
-<p>Number of bedrooms: {{rental.bedrooms}}</p>
+<article class="listing">
+    <a>
+    <img src="{{rental.image}}" alt="">
+    <small>View Larger</small>
+    </a>
+    <h3>{{rental.title}}</h3>
+    <div class="detail">
+        <span>Owner:</span> {{rental.owner}}
+    </div>
+    <div class="detail">
+        <span>Type:</span> {{rental.type}}
+    </div>
+    <div class="detail">
+        <span>Location:</span> {{rental.city}}
+    </div>
+    <div class="detail">
+        <span>Number of bedrooms:</span> {{rental.bedrooms}}
+    </div>
+</article>
 ```
 
 In our `index.hbs` template, let's replace the old HTML markup within our `{{#each}}` loop
 with our new `rental-listing` component:
 
 ```app/templates/index.hbs
-<h1> Welcome to Super Rentals </h1>
-
-We hope you find exactly what you're looking for in a place to stay.
+<div class="jumbo">
+    <img class="right" src="http://emberjs.com/images/blog/2016-02/lts-tomster.png" alt="Tomster">
+    <h2>Welcome!</h2>
+    <p>
+        We hope you find exactly what you're looking for in a place to stay.
+        <br>Browse our listings, or use the search box above to narrow your search.
+    </p>
+    {{#link-to 'about' class="button"}}
+        About Us
+    {{/link-to}}
+</div>
 
 {{#each model as |rentalUnit|}}
   {{rental-listing rental=rentalUnit}}
@@ -54,98 +76,81 @@ and assign each `rentalUnit` as the `rental` attribute of the component.
 
 ## Hiding and Showing an Image
 
-Now we can add functionality that will show the image of a rental when requested by the user.
+Now we can add functionality that will enlarge the image of a rental when requested by the user.
 
-Let's use the `{{#if}}` helper to show our current rental image only when `isImageShowing` is set to true.
-Otherwise, let's show a button to allow our user to toggle this:
+Let's use the `{{#if}}` helper to add the class `wide` to our current link only when `wide` is set to true.
 
 ```app/templates/components/rental-listing.hbs
-<h2>{{rental.title}}</h2>
-<p>Owner: {{rental.owner}}</p>
-<p>Type: {{rental.type}}</p>
-<p>Location: {{rental.city}}</p>
-<p>Number of bedrooms: {{rental.bedrooms}}</p>
-{{#if isImageShowing}}
-  <p><img src={{rental.image}} alt={{rental.type}} width="500"></p>
-{{else}}
-  <button>Show image</button>
-{{/if}}
+<article class="listing">
+    <a class="{{if wide "wide"}}">
+    <img src="{{rental.image}}" alt="">
+    <small>View Larger</small>
+    </a>
+    <h3>{{rental.title}}</h3>
+    <div class="detail">
+        <span>Owner:</span> {{rental.owner}}
+    </div>
+    <div class="detail">
+        <span>Type:</span> {{rental.type}}
+    </div>
+    <div class="detail">
+        <span>Location:</span> {{rental.city}}
+    </div>
+    <div class="detail">
+        <span>Number of bedrooms:</span> {{rental.bedrooms}}
+    </div>
+</article>
 ```
 
-The value of `isImageShowing` comes from our component's JavaScript file, in this case `rental-listing.js`.
+The value of `wide` comes from our component's Javascript file, in this case `rental-listing.js`.
 Since we do not want the image to be showing at first, we will set the property to start as `false`:
 
 ```app/components/rental-listing.js
 export default Ember.Component.extend({
-  isImageShowing: false
+  wide: false
 });
 ```
 
-To make it where clicking on the button shows the image to the user,
-we will need to add an action that changes the value of `isImageShowing` to `true`.
-Let's call this action `imageShow`
+To make it where clicking on the image makes it larger,
+we will need to add an action that changes the value of `wide` to `true`.
+Let's call this action `enlargeImage`
 
 ```app/templates/components/rental-listing.hbs
-<h2>{{rental.title}}</h2>
-<p>Owner: {{rental.owner}}</p>
-<p>Type: {{rental.type}}</p>
-<p>Location: {{rental.city}}</p>
-<p>Number of bedrooms: {{rental.bedrooms}}</p>
-{{#if isImageShowing}}
-  <p><img src={{rental.image}} alt={{rental.type}} width="500"></p>
-{{else}}
-  <button {{action "imageShow"}}>Show image</button>
-{{/if}}
+<article class="listing">
+    <a {{action 'enlargeImage'}} class="{{if wide "wide"}}">
+    <img src="{{rental.image}}" alt="">
+    <small>View Larger</small>
+    </a>
+    <h3>{{rental.title}}</h3>
+    <div class="detail">
+        <span>Owner:</span> {{rental.owner}}
+    </div>
+    <div class="detail">
+        <span>Type:</span> {{rental.type}}
+    </div>
+    <div class="detail">
+        <span>Location:</span> {{rental.city}}
+    </div>
+    <div class="detail">
+        <span>Number of bedrooms:</span> {{rental.bedrooms}}
+    </div>
+</article>
 ```
 
 Clicking this button will send the action to the component.
-Ember will then go into the `actions` hash and call the `imageShow` function.
-Let's create the `imageShow` function and set `isImageShowing` to `true` on our component:
+Ember will then go into the `actions` hash and call the `enlargeImage` function.
+Let's create the `enlargeImage` function and toggle `wide` on our component:
 
 ```app/components/rental-listing.js
 export default Ember.Component.extend({
   isImageShowing: false,
   actions: {
-    imageShow() {
-      this.set('isImageShowing', true);
+    enlargeImage() {
+      this.toggleProperty('wide');
     }
   }
 });
 ```
 
-Now when we click the button in our browser, we can see our image.
+Now when we click the button in our browser, our image becomes larger. When we click it again, it shrinks back to its original size.
 
-We should also let users hide the image.
-In our template, let's add a button with an `imageHide` action:
-
-```app/templates/components/rental-listing.hbs
-<h2>{{rental.title}}</h2>
-<p>Owner: {{rental.owner}}</p>
-<p>Type: {{rental.type}}</p>
-<p>Location: {{rental.city}}</p>
-<p>Number of bedrooms: {{rental.bedrooms}}</p>
-{{#if isImageShowing}}
-  <p><img src={{rental.image}} alt={{rental.type}} width="500"></p>
-  <button {{action "imageHide"}}>Hide image</button>
-{{else}}
-  <button {{action "imageShow"}}>Show image</button>
-{{/if}}
-```
-
-Then let's setup an `imageHide` action handler in our component to set `isImageShowing` to `false`:
-
-```app/components/rental-listing.js
-export default Ember.Component.extend({
-  isImageShowing: false,
-  actions: {
-    imageShow() {
-      this.set('isImageShowing', true);
-    },
-    imageHide() {
-      this.set('isImageShowing', false);
-    }
-  }
-});
-```
-
-Now our users can toggle images on and off using the "Show image" and "Hide image" buttons.

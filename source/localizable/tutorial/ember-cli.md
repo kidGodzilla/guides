@@ -9,10 +9,10 @@ type `ember help <command-name>`.
 ## Creating a New App
 
 To create a new project using Ember CLI, use the `new` command. In preparation
-for the tutorial in the next section, you can make an app called `super-rentals`.
+for the tutorial in the next section, you can make an app called `ember-rentals`.
 
 ```shell
-ember new super-rentals
+ember new ember-rentals
 ```
 
 ## Directory Structure
@@ -77,6 +77,29 @@ and Ember CLI's test runner **testem** is configured in `testem.js`.
 **tmp**: Ember CLI temporary files live here.
 
 **ember-cli-build.js**: This file describes how Ember CLI should build our app.
+
+## The App Directory
+
+All of the code you contribute to your application will generally exist in the `app` directory, so let's take a moment to familiarize ourselves with its structure.
+
+```text
+|--components
+|--controllers
+|--helpers
+|--models
+|--routes
+|--styles
+|--templates
+
+app.js
+index.html
+resolver.js
+router.js
+```
+
+The folders should be easy to understand. Each item you generate using Ember-CLI will create files in the appropriate folders. Ember Components will be placed in the `components` directory, etc. 
+
+The `index.html` file is the page representing your single-page app, and `app.js` is the entry-point for your Ember application. In a basic application, you shouldn't need to make many edits to these files, but if you would like to learn more check out the [Ember-CLI documentation](http://ember-cli.com/user-guide/#layout-within-app-directory). 
 
 ## ES6 Modules
 

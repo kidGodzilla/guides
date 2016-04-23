@@ -6,7 +6,7 @@ Ember integrates with a data management library called Ember Data to help solve 
 Let's generate our first Ember Data model called `rental`:
 
 ```shell
-ember g model rental
+ember g model rental title:string owner:string city:string type:string image:string bedrooms:number
 ```
 
 This results in the creation of a model file and a test file:
@@ -22,28 +22,19 @@ When we open the model file, we see:
 
 ```app/models/rental.js
 import Model from 'ember-data/model';
-
-export default Model.extend({
-
-});
-```
-
-Let's add the same attributes for our rental that we used in our hard-coded array of JavaScript objects -
-_title_, _owner_, _city_, _type_, _image_, and _bedrooms_:
-
-```app/models/rental.js
-import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 
 export default Model.extend({
-  title: attr(),
-  owner: attr(),
-  city: attr(),
-  type: attr(),
-  image: attr(),
-  bedrooms: attr()
+  title: attr('string'),
+  owner: attr('string'),
+  city: attr('string'),
+  type: attr('string'),
+  image: attr('string'),
+  bedrooms: attr('number')
 });
 ```
+
+We just generated a new route called `rental`. You'll notice we also specified a number of attributes after `rental`, like `title`, `owner`, and `city`. For each model, you can specify an unlimited number of attributes. They each carry the format `name:type`, and are separated by a space. 
 
 Now we have a model in our Ember Data store.
 
